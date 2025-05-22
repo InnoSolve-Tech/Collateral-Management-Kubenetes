@@ -1,22 +1,32 @@
 # Collateral Kubernetes Deployment
 
-This repository contains the Kubernetes manifests required to deploy the **Collateral API** and **Frontend** services.
+This repository contains the Kubernetes manifests to deploy the **Collateral API** and **Frontend** services.
 
 ## Prerequisites
 
-Ensure you have the following installed on your machine:
+Make sure you have the following installed on your machine:
 
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Ensure Kubernetes is enabled)
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (with Kubernetes enabled)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
-* [Git Bash](https://gitforwindows.org/) (for Windows users)
+* [Git Bash](https://gitforwindows.org/) (recommended for Windows users)
 
 ---
 
 ## Deployment Steps
 
-### 1. Apply Kubernetes Manifests
+### 1. Enable the Ingress Addon in Minikube
 
-Run the following command in the root of the project directory to deploy all Kubernetes resources:
+Before deploying, enable the ingress controller addon:
+
+```bash
+minikube addons enable ingress
+```
+
+---
+
+### 2. Deploy Kubernetes Resources
+
+From the root of the project directory, run:
 
 ```bash
 kubectl apply -f .
@@ -24,30 +34,40 @@ kubectl apply -f .
 
 ---
 
-### 2. Port Forward Services (For Windows Users)
+### 3. Configure Access (Windows Users)
 
-Once the containers are confirmed to be running, use Git Bash to forward the necessary ports.
+After your pods are running, follow these steps:
 
-#### Start the API service:
-
-```bash
-nohup kubectl port-forward svc/collateral-api-service 8080:8008 > api.log 2>&1 &
-```
-
-#### Start the Web Frontend service:
+#### Patch the Ingress Controller service to use LoadBalancer:
 
 ```bash
-nohup kubectl port-forward svc/collateral-web-service 3000:3000 > web.log 2>&1 &
+kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
-> **Note**: If `nohup` is not recognized, ensure you're using **Git Bash**, not Command Prompt or PowerShell.
+#### Start the Minikube tunnel to expose the LoadBalancer IP:
+
+```bash
+minikube tunnel
+```
+
+> **Note:** Running `minikube tunnel` requires administrative privileges and may prompt for your password.
+
+#### Update your Windows hosts file
+
+Add this line to your `C:\Windows\System32\drivers\etc\hosts` file to map the Ingress host to localhost:
+
+```
+127.0.0.1  192.168.49.2.nip.io
+```
+
+> **Tip:** Use Git Bash or a text editor with administrator rights to edit the hosts file.
 
 ---
 
 ## Access the Application
 
-* **API**: [http://localhost:8080](http://localhost:8080)
-* **Frontend**: [http://localhost:3000](http://localhost:3000)
+* **Frontend:** [http://192.168.49.2.nip.io](http://192.168.49.2.nip.io)
+* **API:** [http://192.168.49.2.nip.io/api](http://192.168.49.2.nip.io/api)
 
 ---
 
@@ -60,9 +80,17 @@ nohup kubectl port-forward svc/collateral-web-service 3000:3000 > web.log 2>&1 &
 
 ## Troubleshooting
 
-* Ensure Docker is running and Kubernetes is enabled.
-* Run `kubectl get pods` to check if all pods are up and running.
-* Use `kubectl logs <pod-name>` to inspect pod-specific logs for debugging.
+* Confirm Docker Desktop is running with Kubernetes enabled.
+* Check pod status:
+
+  ```bash
+  kubectl get pods
+  ```
+* View logs of any pod for debugging:
+
+  ```bash
+  kubectl logs <pod-name>
+  ```
 
 ---
 

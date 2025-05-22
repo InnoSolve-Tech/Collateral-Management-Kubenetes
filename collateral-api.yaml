@@ -29,12 +29,11 @@ kind: Service
 metadata:
   name: collateral-api-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: collateral-api
   ports:
     - protocol: TCP
-      port: 8008
+      port: 8080
       targetPort: 8008
-      nodePort: 30000
       

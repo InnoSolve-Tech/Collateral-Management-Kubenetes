@@ -27,12 +27,11 @@ kind: Service
 metadata:
   name: collateral-web-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: collateral-web
   ports:
     - protocol: TCP
       port: 3000
       targetPort: 3000
-      nodePort: 30008
       
