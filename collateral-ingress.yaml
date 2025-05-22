@@ -22,6 +22,13 @@ spec:
   - host: collateral.local
     http:
       paths:
+      - path: /api/v1
+        pathType: Prefix
+        backend:
+          service:
+            name: collateral-api-service
+            port:
+              number: 8008
       - path: /
         pathType: Prefix
         backend:
@@ -29,10 +36,3 @@ spec:
             name: collateral-web-service
             port:
               number: 3000
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: collateral-api-service
-            port:
-              number: 8008

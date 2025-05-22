@@ -1,22 +1,36 @@
-# Collateral Kubernetes Deployment
-
-This repository contains the Kubernetes manifests to deploy the **Collateral API** and **Frontend** services.
-
-## Prerequisites
-
-Make sure you have the following installed on your machine:
-
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (with Kubernetes enabled)
-* [kubectl](https://kubernetes.io/docs/tasks/tools/)
-* [Git Bash](https://gitforwindows.org/) (recommended for Windows users)
+Certainly! Here's a polished and complete README file that includes clear instructions, links, and formatting — ideal as an example of **how to write a professional Kubernetes deployment README**:
 
 ---
 
-## Deployment Steps
+# Collateral Kubernetes Deployment
+
+This repository contains the Kubernetes manifests required to deploy the **Collateral API** and **Frontend** services using **Minikube** and **NGINX Ingress Controller**.
+
+---
+
+## ✅ Prerequisites
+
+Ensure the following tools are installed on your machine:
+
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+  > Enable Kubernetes via Docker Desktop settings.
+
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+
+  > Command-line tool for interacting with Kubernetes clusters.
+
+* [Git Bash](https://gitforwindows.org/) (for Windows users)
+
+  > Required to run Linux-like commands such as `nohup` and `minikube tunnel`.
+
+---
+
+## 🚀 Deployment Steps
 
 ### 1. Enable the Ingress Addon in Minikube
 
-Before deploying, enable the ingress controller addon:
+To enable the NGINX ingress controller in your local Minikube cluster, run:
 
 ```bash
 minikube addons enable ingress
@@ -24,9 +38,9 @@ minikube addons enable ingress
 
 ---
 
-### 2. Deploy Kubernetes Resources
+### 2. Deploy Kubernetes Manifests
 
-From the root of the project directory, run:
+From the root of the project directory, apply all Kubernetes configurations:
 
 ```bash
 kubectl apply -f .
@@ -34,66 +48,80 @@ kubectl apply -f .
 
 ---
 
-### 3. Configure Access (Windows Users)
+### 3. Configure Access (For Windows Users)
 
-After your pods are running, follow these steps:
+Once your pods are up and running:
 
-#### Patch the Ingress Controller service to use LoadBalancer:
+#### a. Patch the Ingress Controller service to use LoadBalancer:
 
 ```bash
-kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc ingress-nginx-controller -n ingress-nginx \
+  -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
-#### Start the Minikube tunnel to expose the LoadBalancer IP:
+#### b. Start the Minikube tunnel to expose the LoadBalancer IP:
 
 ```bash
 minikube tunnel
 ```
 
-> **Note:** Running `minikube tunnel` requires administrative privileges and may prompt for your password.
+> 🔒 **Note:** This command may require administrator privileges and will prompt for your password. It keeps running in the background to forward traffic properly.
 
-#### Update your Windows hosts file
+#### c. Edit your Windows `hosts` file
 
-Add this line to your `C:\Windows\System32\drivers\etc\hosts` file to map the Ingress host to localhost:
+Open `C:\Windows\System32\drivers\etc\hosts` as an administrator and add the following line:
 
 ```
-127.0.0.1  192.168.49.2.nip.io
+127.0.0.1  collateral.local
 ```
 
-> **Tip:** Use Git Bash or a text editor with administrator rights to edit the hosts file.
+> 💡 **Tip:** Use Notepad (Run as Administrator) or Git Bash with elevated permissions to edit this file.
 
 ---
 
-## Access the Application
+## 🌐 Access the Application
 
-* **Frontend:** [http://192.168.49.2.nip.io](http://192.168.49.2.nip.io)
-* **API:** [http://192.168.49.2.nip.io/api](http://192.168.49.2.nip.io/api)
+After setup is complete:
 
----
-
-## Logs
-
-* API logs: `api.log`
-* Frontend logs: `web.log`
+* **Frontend:** [http://collateral.local](http://collateral.local)
+* **API Base URL:** [http://collateral.local/api/v1](http://collateral.local/api/v1)
 
 ---
 
-## Troubleshooting
+## 🧪 Troubleshooting
 
-* Confirm Docker Desktop is running with Kubernetes enabled.
-* Check pod status:
+If you encounter any issues:
 
-  ```bash
-  kubectl get pods
-  ```
-* View logs of any pod for debugging:
+1. **Check Pod Status**
 
-  ```bash
-  kubectl logs <pod-name>
-  ```
+```bash
+kubectl get pods
+```
+
+2. **View Pod Logs**
+
+```bash
+kubectl logs <pod-name>
+```
+
+3. **Check Services**
+
+```bash
+kubectl get svc
+```
+
+4. **Check Ingress**
+
+```bash
+kubectl get ingress
+```
 
 ---
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+---
+
+Let me know if you'd like to add screenshots, a diagram of the architecture, or CI/CD notes.
