@@ -25,31 +25,120 @@ spec:
                 secretKeyRef:
                   name: mssql-secret
                   key: sa-password
+            - name: MSSQL_PID
+              value: "Express"
           volumeMounts:
             - name: initdb
               mountPath: /usr/config
+            - name: mssql-data
+              mountPath: /var/opt/mssql
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "1000m"
+          livenessProbe:
+            exec:
+              command:
+                - /opt/mssql-tools/bin/sqlcmd
+                - -S
+                - localhost
+                - -U
+                - sa
+                - -P
+                - $(SA_PASSWORD)
+                - -Q
+                - SELECT 1
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - /opt/mssql-tools/bin/sqlcmd
+                - -S
+                - localhost
+                - -U
+                - sa
+                - -P
+                - $(SA_PASSWORD)
+                - -Q
+                - SELECT 1
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+      initContainers:
+        - name: init-database
+          image: mcr.microsoft.com/mssql/server:2019-latest
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mssql-secret
+                  key: sa-password
+            - name: MSSQL_PID
+              value: "Express"
+          volumeMounts:
+            - name: initdb
+              mountPath: /usr/config
+            - name: mssql-data
+              mountPath: /var/opt/mssql
           command:
             - /bin/bash
             - "-c"
             - |
-              # Start SQL Server in background
-              /opt/mssql/bin/sqlservr &
+              set -e
               
+              # Start SQL Server in background
+              echo "Starting SQL Server..."
+              /opt/mssql/bin/sqlservr &
+              SQL_PID=$!
+              
+              # Function to cleanup
+              cleanup() {
+                echo "Shutting down SQL Server..."
+                kill $SQL_PID 2>/dev/null || true
+                wait $SQL_PID 2>/dev/null || true
+              }
+              trap cleanup EXIT
+              
+              # Wait for SQL Server to be ready
               echo "Waiting for SQL Server to start..."
-              # Wait until SQL Server is ready
-              until /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -Q "SELECT 1" > /dev/null 2>&1; do
-                echo "Waiting for SQL Server to become available..."
+              for i in {1..60}; do
+                if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -Q "SELECT 1" > /dev/null 2>&1; then
+                  echo "SQL Server is ready!"
+                  break
+                fi
+                if [ $i -eq 60 ]; then
+                  echo "SQL Server failed to start within timeout"
+                  exit 1
+                fi
+                echo "Attempt $i/60: Waiting for SQL Server..."
                 sleep 2
               done
               
+              # Run initialization script
               echo "Running initialization script..."
-              /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -i /usr/config/init.sql
+              if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -i /usr/config/init.sql; then
+                echo "Database initialization completed successfully!"
+              else
+                echo "Database initialization failed!"
+                exit 1
+              fi
               
-              wait # Keep container running
+              # Graceful shutdown
+              cleanup
       volumes:
         - name: initdb
           configMap:
             name: mssql-initdb
+        - name: mssql-data
+          emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service
@@ -62,3 +151,4 @@ spec:
     - protocol: TCP
       port: 1433
       targetPort: 1433
+  type: ClusterIP

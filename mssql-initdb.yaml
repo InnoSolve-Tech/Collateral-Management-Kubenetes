@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mssql-initdb
+data:
+  init.sql: |
+    -- Create database if not exists
+    IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'collateral_db')
+    BEGIN
+        CREATE DATABASE collateral_db;
+        PRINT 'Database collateral_db created successfully';
+    END
+    ELSE
+    BEGIN
+        PRINT 'Database collateral_db already exists';
+    END
+    GO
+
+    -- Use the database
+    USE collateral_db;
+    GO
+
+    -- Create table if not exists
+    IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name='MyTable' AND xtype='U')
+    BEGIN
+        CREATE TABLE MyTable (
+            Id INT PRIMARY KEY IDENTITY(1,1),
+            Name NVARCHAR(100) NOT NULL,
+            Created DATETIME2 DEFAULT GETDATE()
+        );
+        PRINT 'Table MyTable created successfully';
+    END
+    ELSE
+    BEGIN
+        PRINT 'Table MyTable already exists';
+    END
+    GO
+
+    -- Insert sample data if table is empty
+    IF NOT EXISTS (SELECT * FROM MyTable)
+    BEGIN
+        INSERT INTO MyTable (Name) VALUES ('Sample Record 1');
+        INSERT INTO MyTable (Name) VALUES ('Sample Record 2');
+        PRINT 'Sample data inserted';
+    END
+    GO
+
+    -- Verify the setup
+    SELECT 'Database Setup Complete' AS Status;
+    SELECT COUNT(*) AS RecordCount FROM MyTable;
+    GO
