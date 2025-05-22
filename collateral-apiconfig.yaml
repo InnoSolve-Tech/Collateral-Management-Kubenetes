@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: collateral-api-secret
+type: Opaque
+data:
+  DB_HOST: bXNzcWwtc2VydmljZQ==         # mssql-service
+  DB_PORT: MTQzMw==                      # 1433
+  DB_NAME: Y29sbGF0ZXJhbF9kYg==          # collateral_db
+  DB_USER: c2E=                          # sa
+  DB_PASSWORD: cGFzc3dvcmQ9MQ==          # password=1

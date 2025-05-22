@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mssql-initdb
+data:
+  init.sql: |
+    IF DB_ID('collateral_db') IS NULL
+    BEGIN
+      CREATE DATABASE collateral_db;
+    END

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collateral-api-deployment
+  labels:
+    app: collateral-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: collateral-api
+  template:
+    metadata:
+      labels:
+        app: collateral-api
+    spec:
+      containers:
+      - name: collateral-api
+        image: benzidarwin/collateral-sys-api:v1.0.7
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8008
+        envFrom:
+            - secretRef:
+                name: collateral-api-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collateral-api-service
+spec:
+  type: NodePort
+  selector:
+    app: collateral-api
+  ports:
+    - protocol: TCP
+      port: 8008
+      targetPort: 8008
+      nodePort: 30000
+      
