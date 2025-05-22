@@ -1,7 +1,3 @@
-Certainly! Here's a polished and complete README file that includes clear instructions, links, and formatting — ideal as an example of **how to write a professional Kubernetes deployment README**:
-
----
-
 # Collateral Kubernetes Deployment
 
 This repository contains the Kubernetes manifests required to deploy the **Collateral API** and **Frontend** services using **Minikube** and **NGINX Ingress Controller**.
@@ -121,7 +117,3 @@ kubectl get ingress
 ## 📄 License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-
----
-
-Let me know if you'd like to add screenshots, a diagram of the architecture, or CI/CD notes.
