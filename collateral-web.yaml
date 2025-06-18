@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: collateral-web
-        image: benzidarwin/collateral-management-frontend:main-04ea865
+        image: benzidarwin/collateral-management-frontend:main-9cd58ca
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
