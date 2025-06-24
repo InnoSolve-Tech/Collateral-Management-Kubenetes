@@ -4,8 +4,11 @@ metadata:
   name: collateral-api-secret
 type: Opaque
 data:
-  DB_HOST: MTkyLjE2OC4xMDAuMTQ=          # Local ip address
-  DB_PORT: MTQzMw==                      # 1433
-  DB_NAME: Y29sbGF0ZXJhbF9kYg==          # collateral_db
-  DB_USER: c2E=                          # sa
-  DB_PASSWORD: cGFzc3dvcmQ9MQ==          # password=1
+  DB_HOST: MTkyLjE2OC4xMDAuNDA=
+  DB_PORT: MTQzMw==
+  DB_NAME: Y29sbGF0ZXJhbF9kYg==
+  DB_USER: c2E=
+  DB_PASSWORD: cGFzc3dvcmQ9MQ==
+  SFTP_USERNAME: c3NhbGk=
+  SFTP_PASSWORD: UGFzc3dvcmQ9MQ==
+  SFTP_HOST: MTkyLjE2OC4xMDAuNDA=
