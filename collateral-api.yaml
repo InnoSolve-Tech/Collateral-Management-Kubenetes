@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: collateral-api
-        image: benzidarwin/collateral-sys-api:v1.3.1
+        image: benzidarwin/collateral-sys-api:v1.3.3
         imagePullPolicy: Always
         ports:
         - containerPort: 8008
